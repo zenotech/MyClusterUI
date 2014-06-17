@@ -38,7 +38,8 @@ setup(
     scripts=['scripts/myclusterui'],
     include_package_data=True,
     package_data = {
-        '': ['*.md','RELEASE-VERSION']
+        '': ['*.md','RELEASE-VERSION'],
+        'myclusterui':['images/*.png','images/*.jpg'],
     },
     data_files = [('', ['RELEASE-VERSION'])],
 )

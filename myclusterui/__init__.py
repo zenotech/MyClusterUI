@@ -1,5 +1,6 @@
 
 import sys
+import os
 
 from PySide.QtGui import (QWidget, QDialog, QListWidget, QListWidgetItem,
                                 QVBoxLayout, QStackedWidget, QListView,
@@ -90,6 +91,7 @@ class ConfiguratorWindow(QWidget):
             self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn))
                     
         self.comboboxes['queues'].currentIndexChanged.connect(self.queue_changed)
+        self.queue_changed()
         
     def queue_changed(self):
         index = self.comboboxes['queues'].currentIndex()
@@ -177,22 +179,33 @@ class ConfiguratorWindow(QWidget):
         widget.setLayout(layout)
         return widget
 
+def _resourcepath(directory):
+    '''Returns the path to the resource directory inside the package'''
+    modulename = os.path.abspath(__file__)
+    return os.path.join(os.path.dirname(modulename), directory)
 
 def main():
     app = QApplication(sys.argv)
-    pixmap = QPixmap(":/splash.png")
+    pixmap = QPixmap(os.path.join(_resourcepath('images'),"grape.jpg"))
     splash = QSplashScreen(pixmap,Qt.WindowStaysOnTopHint)
     splash.setMask(pixmap.mask())
+    splash_font = splash.font()
+    splash_font.setPixelSize(10)
+    splash.setFont(splash_font)
     splash.show()
+    splash.showMessage('Initialising...',
+                           Qt.AlignBottom | Qt.AlignCenter | 
+                           Qt.AlignAbsolute,
+                           Qt.white)
     app.processEvents()
-    
+    """
     for count in range(1, 6):
         splash.showMessage('Processing {0}...'.format(count),
                            Qt.AlignBottom | Qt.AlignLeft,
                            Qt.white)
         QApplication.processEvents()
         QThread.msleep(1000)
-        
+    """  
     frame = ConfiguratorWindow()
     
     frame.show_and_raise()
