@@ -88,10 +88,10 @@ class ConfiguratorWindow(QWidget):
 
         self.setWindowTitle("MyCluster Configurator")
 
-        for key,lineedit in self.lineedits.iteritems():
-            if key == 'job_name':
-                lineedit.textChanged.connect(self.job_name_changed)
-                
+        self.lineedits['job_name'].textChanged.connect(self.job_name_changed)
+        self.lineedits['job_name'].setText('myjob')
+        self.lineedits['project_name'].setText('default')
+        self.lineedits['app_script'].setText('myscript.bsh')
         self.init_queue_info()
         
     def save_file(self):
@@ -99,8 +99,11 @@ class ConfiguratorWindow(QWidget):
         index = self.comboboxes['queues'].currentIndex()
         data = self.comboboxes['queues'].itemData(index)
         jobqueue = data.split(' ')[0]
+        
+        # Add checks
+        
         mycluster.create_submit(jobqueue,
-                                    script_name=self.lineedits['job_script'].text(),
+                                    script_name=self.lineedits['job_script'].text()+'.job',
                                     my_script=self.lineedits['app_script'].text(),
                                     my_name=self.lineedits['job_name'].text(),
                                     my_output=self.lineedits['job_output'].text()+'.out',
