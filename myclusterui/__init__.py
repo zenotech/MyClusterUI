@@ -9,7 +9,7 @@ from PySide.QtGui import (QWidget, QDialog, QListWidget, QListWidgetItem,
                                 QComboBox, QColor, QGridLayout, QTabWidget,
                                 QRadioButton, QButtonGroup, QSplitter,
                                 QStyleFactory, QScrollArea,QApplication,QIcon,
-                                QDoubleSpinBox )
+                                QDoubleSpinBox,QSplashScreen, QPixmap )
 from PySide.QtCore import Qt, QSize, SIGNAL, SLOT, Slot
 
 class NoDefault:
@@ -86,7 +86,7 @@ class ConfiguratorWindow(QWidget):
             nc = mycluster.scheduler.node_config(q)
             tpn = mycluster.scheduler.tasks_per_node(q)
             avail = mycluster.scheduler.available_tasks(q)
-            self.comboboxes['queues'].addItem(q+' max task: '+avail['max tasks'], q)
+            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q)
                     
             
     def job_name_changed(self,text):
@@ -173,9 +173,13 @@ class ConfiguratorWindow(QWidget):
 
 def main():
     app = QApplication(sys.argv)
+    pixmap = QPixmap(":/splash.png")
+    splash = QSplashScreen(pixmap)
+    splash.show()
+    app.processEvents()
 
     frame = ConfiguratorWindow()
     
     frame.show_and_raise()
-        
+    splash.finish(frame)
     sys.exit(app.exec_())
