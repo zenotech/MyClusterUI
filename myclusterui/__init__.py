@@ -10,7 +10,7 @@ from PySide.QtGui import (QWidget, QDialog, QListWidget, QListWidgetItem,
                                 QRadioButton, QButtonGroup, QSplitter,
                                 QStyleFactory, QScrollArea,QApplication,QIcon,
                                 QDoubleSpinBox,QSplashScreen, QPixmap )
-from PySide.QtCore import Qt, QSize, SIGNAL, SLOT, Slot
+from PySide.QtCore import Qt, QSize, SIGNAL, SLOT, Slot, QThread
 
 class NoDefault:
     pass
@@ -36,16 +36,17 @@ class ConfiguratorWindow(QWidget):
 
         self.lineedits = {}
         self.comboboxes = {}
+        self.spinboxes = {}
 
         self.job_name_widget = self.create_lineedit('Job Name','job_name')
         self.job_script_widget = self.create_lineedit('Job Script','job_script')
         self.job_output_widget = self.create_lineedit('Job Output','job_output')
-        self.project_name_widget = self.create_lineedit('Project/Account','name')
+        self.project_name_widget = self.create_lineedit('Project/Account','project_name')
         self.queue_widget = self.create_combobox('Queue', [], 'queues')
-        self.num_tasks_widget = self.create_spinbox('Number tasks', '', 'option', NoDefault, 1, 1, 1, 'total number of tasks')
-        self.task_per_node_widget = self.create_spinbox('Task per node', '', 'option', NoDefault, 1, 2, 2, 'tasks per node')
-        self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'option', NoDefault, 1, 36, 1, 'runtime in hrs')
-        self.app_script_widget = self.create_lineedit('Application Script','name')
+        self.num_tasks_widget = self.create_spinbox('Number tasks', '', 'ntasks', NoDefault, 1, 1, 1, 'total number of tasks')
+        self.task_per_node_widget = self.create_spinbox('Task per node', '', 'task_per_node', NoDefault, 1, 2, 2, 'tasks per node')
+        self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'runtime', NoDefault, 1, 36, 1, 'runtime in hrs')
+        self.app_script_widget = self.create_lineedit('Application Script','app_script')
         
         
         hsplitter = QSplitter()
@@ -86,15 +87,21 @@ class ConfiguratorWindow(QWidget):
             nc = mycluster.scheduler.node_config(q)
             tpn = mycluster.scheduler.tasks_per_node(q)
             avail = mycluster.scheduler.available_tasks(q)
-            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q)
+            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks']+' '+str(tpn)))
                     
-            
+        self.comboboxes['queues'].currentIndexChanged.connect(self.queue_changed)
+        
+    def queue_changed(self):
+        index = self.comboboxes['queues'].currentIndex()
+        data = self.comboboxes['queues'].itemData(index)
+        self.spinboxes['ntasks'].setMaximum(int(data.split(' ')[1]))
+        self.spinboxes['task_per_node'].setMaximum(int(data.split(' ')[2]))
+        self.spinboxes['task_per_node'].setValue(int(data.split(' ')[2]))
+    
     def job_name_changed(self,text):
-        print 'job name changed'
+        #print 'job name changed'
         self.lineedits['job_script'].setText(text)
         self.lineedits['job_output'].setText(text)
-        
-        pass
 
     def show_and_raise(self):
         self.show()
@@ -140,7 +147,7 @@ class ConfiguratorWindow(QWidget):
             spinbox.setSingleStep(step)
         if tip is not None:
             spinbox.setToolTip(tip)
-        #self.spinboxes[spinbox] = (option, default)
+        self.spinboxes[option] = spinbox
         layout = QHBoxLayout()
         for subwidget in (plabel, spinbox, slabel):
             if subwidget is not None:
@@ -174,10 +181,18 @@ class ConfiguratorWindow(QWidget):
 def main():
     app = QApplication(sys.argv)
     pixmap = QPixmap(":/splash.png")
-    splash = QSplashScreen(pixmap)
+    splash = QSplashScreen(pixmap,Qt.WindowStaysOnTopHint)
+    splash.setMask(pixmap.mask())
     splash.show()
     app.processEvents()
-
+    
+    for count in range(1, 6):
+        splash.showMessage(splash.tr('Processing %1...').arg(count),
+                           Qt.AlignBottom | Qt.AlignLeft,
+                           Qt.white)
+        QApplication.processEvents()
+        QThread.msleep(1000)
+        
     frame = ConfiguratorWindow()
     
     frame.show_and_raise()
