@@ -222,7 +222,10 @@ def _resourcepath(directory):
 
 def main():
     app = QApplication(sys.argv)
-    pixmap = QPixmap(os.path.join(_resourcepath('images'),"grape.jpg"))
+    import qdarkstyle
+    # setup stylesheet
+    app.setStyleSheet(qdarkstyle.load_stylesheet())
+    pixmap = QPixmap(os.path.join(_resourcepath('images'),"splash.png"))
     splash = QSplashScreen(pixmap,Qt.WindowStaysOnTopHint)
     splash.setMask(pixmap.mask())
     splash_font = splash.font()

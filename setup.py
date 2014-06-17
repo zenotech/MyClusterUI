@@ -34,7 +34,7 @@ setup(
     classifiers=classifiers,
     description='UI for MyCluster Application',
     long_description=open('README.md').read(),
-    install_requires=['MyCluster','PySide'],
+    install_requires=['MyCluster','PySide','qdarkstyle'],
     scripts=['scripts/myclusterui'],
     include_package_data=True,
     package_data = {
