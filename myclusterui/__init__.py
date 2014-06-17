@@ -41,6 +41,7 @@ class ConfiguratorWindow(QWidget):
         self.queue_widget, self.queue_box = self.create_combobox('Queue', [('hybrid 38','hybrid:hybrid.q')], 'name')
         self.num_tasks = self.create_spinbox('Number tasks', '', 'option', NoDefault, 1, 1, 1, 'total number of tasks')
         self.task_per_node = self.create_spinbox('Task per node', '', 'option', NoDefault, 1, 2, 2, 'tasks per node')
+        self.runtime = self.create_spinbox('Runtime', 'hrs', 'option', NoDefault, 1, 36, 1, 'runtime in hrs')
         self.app_script = self.create_lineedit('Application Script','name')
         
         
@@ -61,6 +62,7 @@ class ConfiguratorWindow(QWidget):
         vlayout.addWidget(self.queue_widget)
         vlayout.addWidget(self.num_tasks)
         vlayout.addWidget(self.task_per_node)
+        vlayout.addWidget(self.runtime)
         vlayout.addWidget(self.app_script)
         vlayout.addSpacing(10)
         vlayout.addLayout(btnlayout)
