@@ -34,15 +34,18 @@ class ConfiguratorWindow(QWidget):
         self.connect(bbox, SIGNAL("clicked(QAbstractButton*)"),
                      self.button_clicked)
 
-        self.job_script = self.create_lineedit('Job Script','script')
-        self.job_name = self.create_lineedit('Job Name','name')
-        self.job_output = self.create_lineedit('Job Output','name')
-        self.project_name = self.create_lineedit('Project/Account','name')
-        self.queue_widget, self.queue_box = self.create_combobox('Queue', [('hybrid 38','hybrid:hybrid.q')], 'name')
-        self.num_tasks = self.create_spinbox('Number tasks', '', 'option', NoDefault, 1, 1, 1, 'total number of tasks')
-        self.task_per_node = self.create_spinbox('Task per node', '', 'option', NoDefault, 1, 2, 2, 'tasks per node')
-        self.runtime = self.create_spinbox('Runtime', 'hrs', 'option', NoDefault, 1, 36, 1, 'runtime in hrs')
-        self.app_script = self.create_lineedit('Application Script','name')
+        self.lineedits = {}
+        self.comboboxes = {}
+
+        self.job_name_widget = self.create_lineedit('Job Name','job_name')
+        self.job_script_widget = self.create_lineedit('Job Script','job_script')
+        self.job_output_widget = self.create_lineedit('Job Output','job_output')
+        self.project_name_widget = self.create_lineedit('Project/Account','name')
+        self.queue_widget = self.create_combobox('Queue', [], 'queues')
+        self.num_tasks_widget = self.create_spinbox('Number tasks', '', 'option', NoDefault, 1, 1, 1, 'total number of tasks')
+        self.task_per_node_widget = self.create_spinbox('Task per node', '', 'option', NoDefault, 1, 2, 2, 'tasks per node')
+        self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'option', NoDefault, 1, 36, 1, 'runtime in hrs')
+        self.app_script_widget = self.create_lineedit('Application Script','name')
         
         
         hsplitter = QSplitter()
@@ -55,15 +58,15 @@ class ConfiguratorWindow(QWidget):
         vlayout = QVBoxLayout()
         #vlayout.addWidget(hsplitter)
         
-        vlayout.addWidget(self.job_script)
-        vlayout.addWidget(self.job_name)
-        vlayout.addWidget(self.job_output)
-        vlayout.addWidget(self.project_name)
+        vlayout.addWidget(self.job_name_widget)
+        vlayout.addWidget(self.job_script_widget)
+        vlayout.addWidget(self.job_output_widget)
+        vlayout.addWidget(self.project_name_widget)
         vlayout.addWidget(self.queue_widget)
-        vlayout.addWidget(self.num_tasks)
-        vlayout.addWidget(self.task_per_node)
-        vlayout.addWidget(self.runtime)
-        vlayout.addWidget(self.app_script)
+        vlayout.addWidget(self.num_tasks_widget)
+        vlayout.addWidget(self.task_per_node_widget)
+        vlayout.addWidget(self.runtime_widget)
+        vlayout.addWidget(self.app_script_widget)
         vlayout.addSpacing(10)
         vlayout.addLayout(btnlayout)
 
@@ -71,6 +74,27 @@ class ConfiguratorWindow(QWidget):
 
         self.setWindowTitle("MyCluster Configurator")
 
+        for key,lineedit in self.lineedits.iteritems():
+            if key == 'job_name':
+                lineedit.textChanged.connect(self.job_name_changed)
+                
+        self.init_queue_info()
+        
+    def init_queue_info(self):
+        import mycluster
+        for q in mycluster.queues():
+            nc = mycluster.scheduler.node_config(q)
+            tpn = mycluster.scheduler.tasks_per_node(q)
+            avail = mycluster.scheduler.available_tasks(q)
+            self.comboboxes['queues'].addItem(q+' max task: '+avail['max tasks'], q)
+                    
+            
+    def job_name_changed(self,text):
+        print 'job name changed'
+        self.lineedits['job_script'].setText(text)
+        self.lineedits['job_output'].setText(text)
+        
+        pass
 
     def show_and_raise(self):
         self.show()
@@ -92,7 +116,7 @@ class ConfiguratorWindow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         if tip:
             edit.setToolTip(tip)
-        #self.lineedits[edit] = (option, default)
+        self.lineedits[option] = edit
         widget = QWidget(self)
         widget.setLayout(layout)
         return widget
@@ -136,7 +160,7 @@ class ConfiguratorWindow(QWidget):
             combobox.setToolTip(tip)
         for name, key in choices:
             combobox.addItem(name, key)#to_qvariant(key))
-        #self.comboboxes[combobox] = (option, default)
+        self.comboboxes[option] = combobox 
         layout = QHBoxLayout()
         for subwidget in (label, combobox):
             layout.addWidget(subwidget)
@@ -144,7 +168,7 @@ class ConfiguratorWindow(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         widget = QWidget(self)
         widget.setLayout(layout)
-        return widget, combobox
+        return widget
 
 
 def main():
