@@ -10,22 +10,24 @@ from PySide.QtGui import (QWidget, QDialog, QListWidget, QListWidgetItem,
                                 QComboBox, QColor, QGridLayout, QTabWidget,
                                 QRadioButton, QButtonGroup, QSplitter,
                                 QStyleFactory, QScrollArea,QApplication,QIcon,
-                                QDoubleSpinBox,QSplashScreen, QPixmap )
+                                QDoubleSpinBox,QSplashScreen, QPixmap, QStatusBar, QMainWindow )
 from PySide.QtCore import Qt, QSize, SIGNAL, SLOT, Slot, QThread
 
 class NoDefault:
     pass
 
 
-class ConfiguratorWindow(QWidget):
+class ConfiguratorWindow(QMainWindow):
     def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
 
         # Destroying the C++ object right after closing the dialog box,
         # otherwise it may be garbage-collected in another QThread
         # (e.g. the editor's analysis thread in Spyder), thus leading to
         # a segmentation fault on UNIX or an application crash on Windows
         self.setAttribute(Qt.WA_DeleteOnClose)
+
+        self.statusBar().showMessage('Ready')
 
         self.saveButton = QPushButton(self.tr("Save"))
         self.saveButton.setDefault(True)
