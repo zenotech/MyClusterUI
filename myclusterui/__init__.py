@@ -187,7 +187,7 @@ def main():
     app.processEvents()
     
     for count in range(1, 6):
-        splash.showMessage(splash.tr('Processing %1...').arg(count),
+        splash.showMessage('Processing {0}...'.format(count),
                            Qt.AlignBottom | Qt.AlignLeft,
                            Qt.white)
         QApplication.processEvents()
