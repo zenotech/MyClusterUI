@@ -95,7 +95,19 @@ class ConfiguratorWindow(QWidget):
         self.init_queue_info()
         
     def save_file(self):
-        pass
+        import mycluster
+        index = self.comboboxes['queues'].currentIndex()
+        data = self.comboboxes['queues'].itemData(index)
+        jobqueue = data.split(' ')[0]
+        mycluster.create_submit(jobqueue,
+                                    script_name=self.lineedits['job_script'].text(),
+                                    my_script=self.lineedits['app_script'].text(),
+                                    my_name=self.lineedits['job_name'].text(),
+                                    my_output=self.lineedits['job_output'].text()+'.out',
+                                    num_tasks=self.spinboxes['ntasks'].value(),
+                                    project_name=self.lineedits['project_name'].text(),
+                                    wall_clock=self.spinboxes['runtime'].value(),
+                                    tasks_per_node=self.spinboxes['task_per_node'].value(),)
         
     def init_queue_info(self):
         import mycluster
