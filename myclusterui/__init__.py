@@ -67,7 +67,7 @@ class ConfiguratorWindow(QWidget):
 
         btnlayout = QHBoxLayout()
         btnlayout.addStretch(1)
-        btnlayout.addWidget(bbox)
+        btnlayout.addWidget(buttonBox)
 
         vlayout = QVBoxLayout()
         #vlayout.addWidget(hsplitter)
