@@ -87,7 +87,7 @@ class ConfiguratorWindow(QWidget):
             nc = mycluster.scheduler.node_config(q)
             tpn = mycluster.scheduler.tasks_per_node(q)
             avail = mycluster.scheduler.available_tasks(q)
-            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks']+' '+str(tpn)))
+            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn))
                     
         self.comboboxes['queues'].currentIndexChanged.connect(self.queue_changed)
         
