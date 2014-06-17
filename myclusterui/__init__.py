@@ -86,8 +86,12 @@ class ConfiguratorWindow(QMainWindow):
         vlayout.addSpacing(10)
         vlayout.addLayout(btnlayout)
 
-        self.setLayout(vlayout)
+        self.widget = QWidget()
+        self.widget.setLayout(vlayout)
+        
+        self.setCentralWidget(self.widget)
 
+        #self.setGeometry(300, 300, 350, 250)
         self.setWindowTitle("MyCluster Configurator")
 
         self.lineedits['job_name'].textChanged.connect(self.job_name_changed)
