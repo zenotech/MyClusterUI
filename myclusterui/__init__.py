@@ -27,14 +27,26 @@ class ConfiguratorWindow(QWidget):
         # a segmentation fault on UNIX or an application crash on Windows
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        bbox = QDialogButtonBox(QDialogButtonBox.Ok|QDialogButtonBox.Apply
+        self.saveButton = QPushButton(self.tr("Save"))
+        self.saveButton.setDefault(True)
+        self.quitButton = QPushButton(self.tr("Quit"))
+        self.quitButton.setAutoDefault(False)
+        buttonBox = QDialogButtonBox()
+        buttonBox.addButton(self.saveButton,
+                            QDialogButtonBox.ActionRole)
+        buttonBox.addButton(self.quitButton, QDialogButtonBox.RejectRole)
+        self.connect(self.saveButton, SIGNAL('clicked()'), self.save_file)
+        self.connect(self.quitButton, SIGNAL('clicked()'), self.close)
+        
+        """
+        bbox = QDialogButtonBox(QDialogButtonBox.Apply
                                 |QDialogButtonBox.Cancel)
         self.apply_btn = bbox.button(QDialogButtonBox.Apply)
         self.connect(bbox, SIGNAL("accepted()"), SLOT("accept()"))
         self.connect(bbox, SIGNAL("rejected()"), SLOT("reject()"))
         self.connect(bbox, SIGNAL("clicked(QAbstractButton*)"),
                      self.button_clicked)
-
+        """
         self.lineedits = {}
         self.comboboxes = {}
         self.spinboxes = {}
@@ -81,6 +93,9 @@ class ConfiguratorWindow(QWidget):
                 lineedit.textChanged.connect(self.job_name_changed)
                 
         self.init_queue_info()
+        
+    def save_file(self):
+        pass
         
     def init_queue_info(self):
         import mycluster
