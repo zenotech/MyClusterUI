@@ -153,7 +153,8 @@ class ConfiguratorWindow(QMainWindow):
         else:
             self.statusBar().showMessage('Ready')
 
-    def check_app_script(self,text):
+    def check_app_script(self):
+        text = self.lineedits['app_script'].text()
         if not os.path.isfile(text):
             self.statusBar().showMessage('Warning file: '+text+' does not exists')
         else:
