@@ -83,7 +83,7 @@ class ConfiguratorWindow(QMainWindow):
         hlayout = QHBoxLayout()
         hlayout.addWidget(self.queue_widget)
         hlayout.addWidget(self.availability_label)
-        vlayout.addWidget(hlayout)
+        vlayout.addLayout(hlayout)
         vlayout.addWidget(self.num_tasks_widget)
         vlayout.addWidget(self.task_per_node_widget)
         vlayout.addWidget(self.runtime_widget)
