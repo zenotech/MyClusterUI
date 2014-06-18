@@ -100,6 +100,7 @@ class ConfiguratorWindow(QMainWindow):
         self.setWindowTitle("MyCluster Job Configurator")
 
         self.lineedits['job_name'].textChanged.connect(self.job_name_changed)
+        self.lineedits['job_script'].textChanged.connect(self.job_script_changed)
         self.lineedits['job_name'].setText('myjob')
         self.lineedits['project_name'].setText('default')
         self.lineedits['app_script'].setText('myscript.bsh')
@@ -147,6 +148,8 @@ class ConfiguratorWindow(QMainWindow):
         #print 'job name changed'
         self.lineedits['job_script'].setText(text)
         self.lineedits['job_output'].setText(text)
+
+    def job_script_changed(self,text):
         # Check for file exist
         if os.path.isfile(text+'.job'):
             self.statusBar().showMessage('Warning file: '+text+'.job already exists')
