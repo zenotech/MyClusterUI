@@ -41,6 +41,5 @@ setup(
         '': ['*.md','RELEASE-VERSION'],
         'myclusterui':['images/*.png','images/*.jpg'],
     },
-    data_files = [('', ['RELEASE-VERSION']),
-                  ('myclusterui', ['images/*.png','images/*.jpg'])],
+    data_files = [('share/MyClusterUI', ['RELEASE-VERSION']),],
 )

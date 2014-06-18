@@ -51,7 +51,7 @@ def call_git_describe(abbrev=4):
 
 def read_release_version():
     try:
-        filename = resource_filename(Requirement.parse("MyCluster"),"RELEASE-VERSION")
+        filename = resource_filename(Requirement.parse("MyClusterUI"),"share/MyClusterUI/RELEASE-VERSION")
         f = open(filename, 'r')
 
         try:
