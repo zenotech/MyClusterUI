@@ -52,12 +52,14 @@ class ConfiguratorWindow(QMainWindow):
         self.lineedits = {}
         self.comboboxes = {}
         self.spinboxes = {}
+        self.availability_label = None
 
         self.job_name_widget = self.create_lineedit('Job Name','job_name')
         self.job_script_widget = self.create_lineedit('Job Script','job_script')
         self.job_output_widget = self.create_lineedit('Job Output','job_output')
         self.project_name_widget = self.create_lineedit('Project/Account','project_name')
         self.queue_widget = self.create_combobox('Queue', [], 'queues')
+        self.availability_label = QLabel('Available:')
         self.num_tasks_widget = self.create_spinbox('Number tasks', '', 'ntasks', NoDefault, 1, 1, 1, 'total number of tasks')
         self.task_per_node_widget = self.create_spinbox('Task per node', '', 'task_per_node', NoDefault, 1, 2, 2, 'tasks per node')
         self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'runtime', NoDefault, 1, 36, 1, 'runtime in hrs')
@@ -78,7 +80,10 @@ class ConfiguratorWindow(QMainWindow):
         vlayout.addWidget(self.job_script_widget)
         vlayout.addWidget(self.job_output_widget)
         vlayout.addWidget(self.project_name_widget)
-        vlayout.addWidget(self.queue_widget)
+        hlayout = QHBoxLayout()
+        hlayout.addWidget(self.queue_widget)
+        hlayout.addWidget(self.availability_label)
+        vlayout.addWidget(hlayout)
         vlayout.addWidget(self.num_tasks_widget)
         vlayout.addWidget(self.task_per_node_widget)
         vlayout.addWidget(self.runtime_widget)
@@ -92,12 +97,13 @@ class ConfiguratorWindow(QMainWindow):
         self.setCentralWidget(self.widget)
 
         #self.setGeometry(300, 300, 350, 250)
-        self.setWindowTitle("MyCluster Configurator")
+        self.setWindowTitle("MyCluster Job Configurator")
 
         self.lineedits['job_name'].textChanged.connect(self.job_name_changed)
         self.lineedits['job_name'].setText('myjob')
         self.lineedits['project_name'].setText('default')
         self.lineedits['app_script'].setText('myscript.bsh')
+        self.lineedits['app_script'].editingFinished.connect(self.check_app_script)
         self.init_queue_info()
         
     def save_file(self):
@@ -124,7 +130,7 @@ class ConfiguratorWindow(QMainWindow):
             nc = mycluster.scheduler.node_config(q)
             tpn = mycluster.scheduler.tasks_per_node(q)
             avail = mycluster.scheduler.available_tasks(q)
-            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn))
+            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn)+ ' '+str(avail['available']))
                     
         self.comboboxes['queues'].currentIndexChanged.connect(self.queue_changed)
         self.queue_changed()
@@ -135,11 +141,24 @@ class ConfiguratorWindow(QMainWindow):
         self.spinboxes['ntasks'].setMaximum(int(data.split(' ')[1]))
         self.spinboxes['task_per_node'].setMaximum(int(data.split(' ')[2]))
         self.spinboxes['task_per_node'].setValue(int(data.split(' ')[2]))
+        self.availability_label.setText('Available: '+data.split(' ')[3]+' tasks')
     
     def job_name_changed(self,text):
         #print 'job name changed'
         self.lineedits['job_script'].setText(text)
         self.lineedits['job_output'].setText(text)
+        # Check for file exist
+        if os.path.isfile(text+'.job'):
+            self.statusBar().showMessage('Warning file: '+text+'.job already exists')
+        else:
+            self.statusBar().showMessage('Ready')
+
+    def check_app_script(self,text):
+        if not os.path.isfile(text):
+            self.statusBar().showMessage('Warning file: '+text+' does not exists')
+        else:
+            self.statusBar().showMessage('Ready')
+        pass
 
     def show_and_raise(self):
         self.show()
@@ -229,11 +248,11 @@ def main():
     splash = QSplashScreen(pixmap,Qt.WindowStaysOnTopHint)
     splash.setMask(pixmap.mask())
     splash_font = splash.font()
-    splash_font.setPixelSize(10)
+    splash_font.setPixelSize(14)
     splash.setFont(splash_font)
     splash.show()
     splash.showMessage('Initialising...',
-                           Qt.AlignBottom | Qt.AlignCenter | 
+                           Qt.AlignBottom | Qt.AlignLeft | 
                            Qt.AlignAbsolute,
                            Qt.white)
     app.processEvents()
