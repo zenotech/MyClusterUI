@@ -61,7 +61,7 @@ class ConfiguratorWindow(QMainWindow):
         self.queue_widget = self.create_combobox('Queue', [], 'queues')
         self.availability_label = QLabel('Available:')
         self.num_tasks_widget = self.create_spinbox('Number tasks', '', 'ntasks', NoDefault, 1, 1, 1, 'total number of tasks')
-        self.task_per_node_widget = self.create_spinbox('Task per node', '', 'task_per_node', NoDefault, 1, 2, 2, 'tasks per node')
+        self.task_per_node_widget = self.create_spinbox('Task per node', '', 'task_per_node', NoDefault, 1, 2, 1, 'tasks per node')
         self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'runtime', NoDefault, 1, 36, 1, 'runtime in hrs')
         self.app_script_widget = self.create_lineedit('Application Script','app_script')
         
@@ -109,40 +109,43 @@ class ConfiguratorWindow(QMainWindow):
         
     def save_file(self):
         import mycluster
-        index = self.comboboxes['queues'].currentIndex()
-        data = self.comboboxes['queues'].itemData(index)
-        jobqueue = data.split(' ')[0]
-        
-        # Add checks
-        
-        mycluster.create_submit(jobqueue,
-                                    script_name=self.lineedits['job_script'].text()+'.job',
-                                    my_script=self.lineedits['app_script'].text(),
-                                    my_name=self.lineedits['job_name'].text(),
-                                    my_output=self.lineedits['job_output'].text()+'.out',
-                                    num_tasks=self.spinboxes['ntasks'].value(),
-                                    project_name=self.lineedits['project_name'].text(),
-                                    wall_clock=self.spinboxes['runtime'].value(),
-                                    tasks_per_node=self.spinboxes['task_per_node'].value(),)
+        if mycluster.scheduler:
+            index = self.comboboxes['queues'].currentIndex()
+            data = self.comboboxes['queues'].itemData(index)
+            jobqueue = data.split(' ')[0]
+            
+            # Add checks
+            
+            mycluster.create_submit(jobqueue,
+                                        script_name=self.lineedits['job_script'].text()+'.job',
+                                        my_script=self.lineedits['app_script'].text(),
+                                        my_name=self.lineedits['job_name'].text(),
+                                        my_output=self.lineedits['job_output'].text()+'.out',
+                                        num_tasks=self.spinboxes['ntasks'].value(),
+                                        project_name=self.lineedits['project_name'].text(),
+                                        wall_clock=self.spinboxes['runtime'].value(),
+                                        tasks_per_node=self.spinboxes['task_per_node'].value(),)
         
     def init_queue_info(self):
         import mycluster
-        for q in mycluster.queues():
-            nc = mycluster.scheduler.node_config(q)
-            tpn = mycluster.scheduler.tasks_per_node(q)
-            avail = mycluster.scheduler.available_tasks(q)
-            self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn)+ ' '+str(avail['available']))
+        if mycluster.scheduler:
+            for q in mycluster.queues():
+                nc = mycluster.scheduler.node_config(q)
+                tpn = mycluster.scheduler.tasks_per_node(q)
+                avail = mycluster.scheduler.available_tasks(q)
+                self.comboboxes['queues'].addItem(q+' max task: '+str(avail['max tasks']), q+' '+str(avail['max tasks'])+' '+str(tpn)+ ' '+str(avail['available']))
                     
         self.comboboxes['queues'].currentIndexChanged.connect(self.queue_changed)
         self.queue_changed()
         
     def queue_changed(self):
-        index = self.comboboxes['queues'].currentIndex()
-        data = self.comboboxes['queues'].itemData(index)
-        self.spinboxes['ntasks'].setMaximum(int(data.split(' ')[1]))
-        self.spinboxes['task_per_node'].setMaximum(int(data.split(' ')[2]))
-        self.spinboxes['task_per_node'].setValue(int(data.split(' ')[2]))
-        self.availability_label.setText('Available: '+data.split(' ')[3]+' tasks')
+        if self.comboboxes['queues'].count():
+            index = self.comboboxes['queues'].currentIndex()
+            data = self.comboboxes['queues'].itemData(index)
+            self.spinboxes['ntasks'].setMaximum(int(data.split(' ')[1]))
+            self.spinboxes['task_per_node'].setMaximum(int(data.split(' ')[2]))
+            self.spinboxes['task_per_node'].setValue(int(data.split(' ')[2]))
+            self.availability_label.setText('Available: '+data.split(' ')[3]+' tasks')
     
     def job_name_changed(self,text):
         #print 'job name changed'
