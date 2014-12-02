@@ -108,7 +108,7 @@ class ConfiguratorWindow(QMainWindow):
         self.init_queue_info()
         
     def save_file(self):
-        import mycluster
+        from mycluster import mycluster
         if mycluster.scheduler:
             index = self.comboboxes['queues'].currentIndex()
             data = self.comboboxes['queues'].itemData(index)
@@ -127,7 +127,7 @@ class ConfiguratorWindow(QMainWindow):
                                         tasks_per_node=self.spinboxes['task_per_node'].value(),)
         
     def init_queue_info(self):
-        import mycluster
+        from mycluster import mycluster
         if mycluster.scheduler:
             for q in mycluster.queues():
                 nc = mycluster.scheduler.node_config(q)
