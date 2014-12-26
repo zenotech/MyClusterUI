@@ -2,7 +2,7 @@
 
 import sys
 import os
-import myclusterui
+from myclusterui import myclusterui
 import argparse
 
 def main():

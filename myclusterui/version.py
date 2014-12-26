@@ -35,28 +35,41 @@ __all__ = ("get_git_version")
 
 from subprocess import Popen, PIPE
 import os
+import sys
 from pkg_resources import Requirement, resource_filename
 
 def call_git_describe(abbrev=4):
     try:
-        p = Popen(['git', 'describe', '--abbrev=%d' % abbrev],
+        p = Popen(['git', 'describe', '--tags', '--exact-match'],
                   stdout=PIPE, stderr=PIPE)
-        p.stderr.close()
-        line = p.stdout.readlines()[0]
-        return line.strip()
-
-    except:
+        return_code = p.wait()
+        if return_code == 0:
+            p.stderr.close()
+            line = p.stdout.readlines()[0]
+            return line.strip()
+        else:
+            p.stderr.close()
+            p.stdout.close()
+            p = Popen(['git', 'describe', '--abbrev=%d' % abbrev],
+                  stdout=PIPE, stderr=PIPE)
+            p.stderr.close()
+            line = p.stdout.readlines()[0] 
+            return line.strip()
+    except Exception, e:
         return None
-
 
 def read_release_version():
     try:
-        filename = resource_filename(Requirement.parse("MyClusterUI"),"share/MyClusterUI/RELEASE-VERSION")
+        filename = os.path.join(sys.prefix, "share", "MyCluster", "RELEASE-VERSION")
         if os.path.isfile(filename):
             f = open(filename, 'r')
         else:
-            filename = resource_filename(Requirement.parse("MyClusterUI"),"RELEASE-VERSION")
-            f = open(filename, 'r')
+            filename = resource_filename(Requirement.parse("MyCluster"),"share/MyCluster/RELEASE-VERSION")
+            if os.path.isfile(filename):
+                f = open(filename, 'r')
+            else:
+                filename = resource_filename(Requirement.parse("MyCluster"),"RELEASE-VERSION")
+                f = open(filename, 'r')
         try:
             version = f.readlines()[0]
             return version.strip()
