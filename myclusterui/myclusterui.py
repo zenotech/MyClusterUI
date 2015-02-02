@@ -105,6 +105,10 @@ class ConfiguratorWindow(QMainWindow):
         self.lineedits['project_name'].setText('default')
         self.lineedits['app_script'].setText('myscript.bsh')
         self.lineedits['app_script'].editingFinished.connect(self.check_app_script)
+
+        from mycluster import mycluster
+        mycluster.init()
+
         self.init_queue_info()
         
     def save_file(self):
