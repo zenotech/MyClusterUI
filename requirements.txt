@@ -1,0 +1,4 @@
+MyCluster
+PySide
+qdarkstyle
+nose

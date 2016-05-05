@@ -11,13 +11,7 @@ classes = """
     Topic :: System :: Logging
     Programming Language :: Python
     Programming Language :: Python :: 2
-    Programming Language :: Python :: 2.6
     Programming Language :: Python :: 2.7
-    Programming Language :: Python :: 3
-    Programming Language :: Python :: 3.2
-    Programming Language :: Python :: 3.3
-    Programming Language :: Python :: 3.4
-    Programming Language :: Python :: Implementation :: CPython
     Operating System :: POSIX :: Linux
 """
 classifiers = [s.strip() for s in classes.split('\n') if s]
