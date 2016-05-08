@@ -76,8 +76,11 @@ class ConfiguratorWindow(QMainWindow):
         self.runtime_widget = self.create_spinbox('Runtime', 'hrs', 'runtime',
                                                   NoDefault, 1, 36, 1,
                                                   'runtime in hrs')
-        self.app_script_widget = self.create_lineedit('Application Script',
-                                                      'app_script')
+        self.app_script_widget = self.create_combobox('Application Script',
+                                                    [('mycluster-zcfd.bsh','mycluster-zcfd.bsh'),
+                                                     ('mycluster-paraview.bsh','mycluster-paraview.bsh'),
+                                                     ('mycluster-fluent.bsh','mycluster-fluent.bsh')],
+                                                    'app_script')
 
         # hsplitter = QSplitter()
         # hsplitter.addWidget(self.pages_widget)
@@ -116,8 +119,9 @@ class ConfiguratorWindow(QMainWindow):
         self.lineedits['job_script'].textChanged.connect(self.job_script_changed)
         self.lineedits['job_name'].setText('myjob')
         self.lineedits['project_name'].setText('default')
-        self.lineedits['app_script'].setText('myscript.bsh')
-        self.lineedits['app_script'].editingFinished.connect(self.check_app_script)
+        #self.lineedits['app_script'].setText('myscript.bsh')
+        self.comboboxes['app_script'].setEditable(True)
+        self.comboboxes['app_script'].lineEdit().editingFinished.connect(self.check_app_script)
 
         from mycluster import mycluster
         mycluster.init()
@@ -163,7 +167,8 @@ class ConfiguratorWindow(QMainWindow):
             self.spinboxes['ntasks'].setMaximum(int(data.split(' ')[1]))
             self.spinboxes['task_per_node'].setMaximum(int(data.split(' ')[2]))
             self.spinboxes['task_per_node'].setValue(int(data.split(' ')[2]))
-            self.availability_label.setText('Available: '+data.split(' ')[3]+' tasks')
+            self.availability_label.setText('Available: ' +
+                                            data.split(' ')[3] + ' tasks')
 
     def job_name_changed(self, text):
         # print 'job name changed'
@@ -172,15 +177,17 @@ class ConfiguratorWindow(QMainWindow):
 
     def job_script_changed(self, text):
         # Check for file exist
-        if os.path.isfile(text+'.job'):
-            self.statusBar().showMessage('Warning file: '+text+'.job already exists')
+        if os.path.isfile(text + '.job'):
+            self.statusBar().showMessage('Warning file: ' +
+                                         text + '.job already exists')
         else:
             self.statusBar().showMessage('Ready')
 
     def check_app_script(self):
-        text = self.lineedits['app_script'].text()
+        text = self.comboboxes['app_script'].lineEdit().text()
         if not os.path.isfile(text):
-            self.statusBar().showMessage('Warning file: '+text+' does not exists')
+            self.statusBar().showMessage('Warning file: ' +
+                                         text + ' does not exists')
         else:
             self.statusBar().showMessage('Ready')
         pass
@@ -247,6 +254,7 @@ class ConfiguratorWindow(QMainWindow):
         combobox = QComboBox()
         if tip is not None:
             combobox.setToolTip(tip)
+        # combobox.setEditable(True)
         for name, key in choices:
             combobox.addItem(name, key)  # to_qvariant(key))
         self.comboboxes[option] = combobox
