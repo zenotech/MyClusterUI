@@ -135,11 +135,15 @@ class ConfiguratorWindow(QMainWindow):
             data = self.comboboxes['queues'].itemData(index)
             jobqueue = data.split(' ')[0]
 
+            index = self.comboboxes['app_script'].currentIndex()
+            data = self.comboboxes['app_script'].itemData(index)
+            app_script = data.split(' ')[0]
+
             # Add checks
 
             mycluster.create_submit(jobqueue,
                                     script_name=self.lineedits['job_script'].text()+'.job',
-                                    my_script=self.lineedits['app_script'].text(),
+                                    my_script=app_script,
                                     my_name=self.lineedits['job_name'].text(),
                                     my_output=self.lineedits['job_output'].text()+'.out',
                                     num_tasks=self.spinboxes['ntasks'].value(),
